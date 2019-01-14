@@ -1,9 +1,33 @@
 {
   "deploy_settings": {
     "default": {
-      "skill_id": "",
+      "skill_id": "amzn1.ask.skill.30bd4f6b-2f48-4fbc-8aa3-ac0baf827e6d",
       "was_cloned": false,
-      "merge": {}
+      "merge": {},
+      "resources": {
+        "manifest": {
+          "eTag": "4dd8e472673f7df3219bf557694cd259"
+        },
+        "interactionModel": {
+          "en-US": {
+            "eTag": "bb27e3511cfe816e2fe9a268eff45bb5"
+          }
+        },
+        "lambda": [
+          {
+            "alexaUsage": [
+              "custom/default"
+            ],
+            "arn": "arn:aws:lambda:us-east-1:471260279600:function:ask-custom-InBetweenGame-default",
+            "awsRegion": "us-east-1",
+            "codeUri": "lambda/custom",
+            "functionName": "ask-custom-InBetweenGame-default",
+            "handler": "index.handler",
+            "revisionId": "1abf14d1-ece3-41c4-a393-616d9a50ae66",
+            "runtime": "nodejs8.10"
+          }
+        ]
+      }
     }
   }
 }

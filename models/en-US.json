@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "hello world",
+      "invocationName": "in between game",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
@@ -16,9 +16,17 @@
           "samples": []
         },
         {
-          "name": "HelloWorldIntent",
+          "name": "AMAZON.YesIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": []
+        },
+        {
+          "name": "BeginGameIntent",
           "samples": [
-            "hello"
+            "lets play"
           ]
         }
       ]
