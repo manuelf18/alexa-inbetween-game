@@ -6,11 +6,11 @@
       "merge": {},
       "resources": {
         "manifest": {
-          "eTag": "8acecc7e725fafaac5a2ebef2682d018"
+          "eTag": "c1e6cb61539b6730fd35a9861a33dcf9"
         },
         "interactionModel": {
           "en-US": {
-            "eTag": "1333c74437564ba0e19c74d7d0f4fca8"
+            "eTag": "3726cc8bb3077f57b6635ed59d2a5c0f"
           }
         },
         "lambda": [
@@ -23,7 +23,7 @@
             "codeUri": "lambda/custom",
             "functionName": "ask-custom-InBetweenGame-default",
             "handler": "index.handler",
-            "revisionId": "cda8226b-9f50-4ada-8106-f5770e3e575f",
+            "revisionId": "ac193809-762e-41ba-8012-da3df1b56e69",
             "runtime": "nodejs8.10"
           }
         ]

@@ -3,14 +3,14 @@
     "publishingInformation": {
       "locales": {
         "en-US": {
-          "summary": "Play the game in between.",
+          "summary": "Play the game acey deucey.",
           "examplePhrases": [
-            "Alexa, open in between game",
-            "Alexa, tell in between game let's play",
-            "Alexa, ask in between game help"
+            "Alexa, open acey deucey",
+            "Alexa, tell acey deucey let's play",
+            "Alexa, ask acey deucey help"
           ],
-          "name": "In Between Game",
-          "description": "We'll deal two cards and you have to guess if the next card is in between the two previous cards."
+          "name": "Acey Deucey Game",
+          "description": "We'll deal two cards and you have to guess if the next card is in betweeen the two previous cards."
         }
       },
       "isAvailableWorldwide": true,

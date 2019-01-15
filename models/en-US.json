@@ -1,7 +1,7 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "in between game",
+      "invocationName": "acey deucey",
       "intents": [
         {
           "name": "AMAZON.CancelIntent",
