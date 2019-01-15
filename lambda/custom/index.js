@@ -56,15 +56,29 @@ const DECK = [
   {name: 'Q', value: 12, suit: 'spades'},
   {name: 'K', value: 13, suit: 'spades'}
 ]
+var card1;
+var card2;
+var points = 0;
 
 function dealCards(){
+  /* returns two cards which are not the same */
   let card1Index;
   let card2Index;
   do {
     card1Index = Math.floor(Math.random()*DECK.length);
     card2Index = Math.floor(Math.random()*DECK.length);
-  } while (card1Index === card2Index);
+    if (DECK[card1Index].value > DECK[card2Index].value) {
+      let aux = card2Index;
+      card2Index = card1Index;
+      card1Index = aux;
+    }
+  } while((card1Index === card2Index) || (DECK[card1Index].value === DECK[card2Index].value) || (DECK[card1Index].name === 'K' && DECK[card2Index].name === 'A') || (DECK[card2Index].value - DECK[card1Index].value === 1));
   return [DECK[card1Index], DECK[card2Index]];
+}
+
+function dealCard(){
+  /* returns one card */
+  return DECK[Math.floor(Math.random()*DECK.length)];
 }
 
 function getIndex(name, suit){
@@ -72,53 +86,123 @@ function getIndex(name, suit){
 }
 
 function removeCard(name, suit){
-  index = getIndex(name, suit);
+  let index = getIndex(name, suit);
   if (index != -1){
     DECK.splice(index, 1);
   }
 }
 
-function isInBetween(value1, value2, response){
-  if (response < value1 && response > value2)
+function isInBetween(value1, value2, valuePlayer){
+  if (valuePlayer > value1 && valuePlayer < value2)
     return true;
   return false;
 }
 
 function canPlay(){
-  if (DECK.length > 0)
+  if (DECK.length >= 3)
     return true;
   return false;
 }
 
-const repront = 'Say Yes for me to deal a card, say No for me to deal you two more cards'
-
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
-    return handlerInput.requestEnvelope.request.type === 'LaunchRequest';
+    return handlerInput.requestEnvelope.request.type === 'LaunchRequest' || 
+          (handlerInput.requestEnvelope.request.type === 'IntentRequest' && handlerInput.requestEnvelope.request.intent.name === 'BeginGameIntent');
   },
   handle(handlerInput) {
-    cards = dealCards();
-    index1 = removeCard(cards[0].name, cards[0].suit);
-    index2 = removeCard(cards[1].name, cards[1].suit);
+    [card1, card2] = dealCards();
+    removeCard(card1.name, card1.suit);
+    removeCard(card2.name, card2.suit);
 
     const speechText = `We are going to play a session of in between. I will deal two cards, say yes if
-                        you believe that the next card I'll deal will be between card.
-                        Your first cards are: ${cards[0].name} of ${cards[0].suit}
-                        and ${cards[1].name} of ${cards[1].suit}`;
+                        you believe that the next card I'll deal will be of a value between the two previous cards, or
+                        say dont if you dont believe it.
+                        Your first cards are: ${card1.name} of ${card1.suit}
+                        and ${card2.name} of ${card2.suit}`;
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    sessionAttributes.gameStarted = true;
     return handlerInput.responseBuilder
       .speak(speechText)
-      .reprompt(repront)
+      .reprompt(speechText)
       .withSimpleCard('Game Begins', speechText)
       .getResponse();
   },
 };
 
 const YesIntentHandler = {
-
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let gameStarted = false; 
+    if (sessionAttributes.gameStarted && sessionAttributes.gameStarted === true)
+      gameStarted = true;
+    return gameStarted && handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.YesIntent';
+  },
+  handle(handlerInput){
+    let card = dealCard();
+    removeCard(card.name, card.suit);
+    let speechText = `The card that was deal was ${card.name} of ${card.suit}, and `;
+    if(isInBetween(card1.value, card2.value, card.value)){
+      points += 1;
+      speechText += `you guess correctly.`;  
+    }
+    else{
+      speechText += `you didnt guess correctly. `;  
+    }
+    if(canPlay()){
+      [card1, card2] = dealCards();
+      removeCard(card1.name, card1.suit);
+      removeCard(card2.name, card2.suit);      
+      speechText += `Your points are: ${points}. Your next cards are: ${card1.name} of ${card1.suit}
+      and ${card2.name} of ${card2.suit}`
+    }
+    else{
+      speechText += `There are not enough cards left to play. Thanks for playing. You got ${points} points.`    
+    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .withSimpleCard('Your guess', speechText)
+      .getResponse();
+  }
 }
 
 const NoIntentHandler = {
-
+  canHandle(handlerInput) {
+    const sessionAttributes = handlerInput.attributesManager.getSessionAttributes();
+    let gameStarted = false; 
+    if (sessionAttributes.gameStarted && sessionAttributes.gameStarted === true)
+      gameStarted = true;
+    return gameStarted && handlerInput.requestEnvelope.request.type === 'IntentRequest'
+      && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.NoIntent';
+  },
+  handle(handlerInput){
+    let card = dealCard();
+    removeCard(card.name, card.suit);
+    let speechText = `The card that was deal was ${card.name} of ${card.suit}, and `;
+    if(!isInBetween(card1.value, card2.value, card.value)){
+      points += 1;
+      speechText += 'you guess correctly. ';  
+    }
+    else{
+      speechText += `you didnt guess correctly. `;  
+    }
+    if(canPlay()){
+      [card1, card2] = dealCards();
+      removeCard(card1.name, card1.suit);
+      removeCard(card2.name, card2.suit);      
+      speechText += `Your points are: ${points}. Your next cards are: ${card1.name} of ${card1.suit}
+      and ${card2.name} of ${card2.suit}`
+    }
+    else{
+      speechText += `There are not enough cards left to play. Thanks for playing. You got ${points} points.`    
+    }
+    return handlerInput.responseBuilder
+      .speak(speechText)
+      .reprompt(speechText)
+      .withSimpleCard('Your guess', speechText)
+      .getResponse();
+  }
 }
 
 const HelpIntentHandler = {
@@ -127,12 +211,17 @@ const HelpIntentHandler = {
       && handlerInput.requestEnvelope.request.intent.name === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speechText = 'I will deal';
+    const speechText = `I will deal two cards, you have to guess if the next card I\'ll deal is gonna be of a value between the first and second card I just dealt.
+                        for example if I deal an 4 of hearts and a 9 of spades, a 6 of hearts would make you win, if you say Yes and I deal a 10 of clubs you'll lose, but
+                        you'll win if you had said No.
+                        Some aditional rules are: The A card counts as 1, cards with the same value dont count as in between, for example if I deal a 5 and a 8, if the next card 
+                        is a 8 and you say Yes, you'll lose, but if you say No you'll win. 
+                        So, are you willing to take the risk?`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
       .reprompt(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('Help & Rules', speechText)
       .getResponse();
   },
 };
@@ -144,11 +233,11 @@ const CancelAndStopIntentHandler = {
         || handlerInput.requestEnvelope.request.intent.name === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speechText = 'Goodbye!';
+    const speechText = `You got a total of ${points}, thanks for playing`;
 
     return handlerInput.responseBuilder
       .speak(speechText)
-      .withSimpleCard('Hello World', speechText)
+      .withSimpleCard('Goodbye!', speechText)
       .getResponse();
   },
 };
@@ -183,6 +272,8 @@ const skillBuilder = Alexa.SkillBuilders.custom();
 exports.handler = skillBuilder
   .addRequestHandlers(
     LaunchRequestHandler,
+    YesIntentHandler,
+    NoIntentHandler,
     HelpIntentHandler,
     CancelAndStopIntentHandler,
     SessionEndedRequestHandler
